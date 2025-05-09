@@ -5,7 +5,20 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { HelpCircle, Brain, Moon, Sun, AlertCircle, Calendar, PlusCircle, Check } from "lucide-react"
+import {
+  HelpCircle,
+  Brain,
+  Moon,
+  Sun,
+  AlertCircle,
+  Calendar,
+  Upload,
+  FileText,
+  PlusCircle,
+  X,
+  Search,
+  Check,
+} from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -17,11 +30,22 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Slider } from "@/components/ui/slider"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-// CSS Animations and Styles
-const styles = `
+// Add import for the Synaxarium components
+import { SynaxariumCard, SynaxariumDialog } from "@/components/synaxarium"
+
+// Add more animations for Holy Week and Easter
+const animateSpinSlow = `
 @keyframes spin-slow {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -105,167 +129,6 @@ const styles = `
 .animate-watermark-fade {
   animation: watermark-fade 8s ease-in-out infinite;
 }
-
-@font-face {
-  font-family: 'El Messiri';
-  src: url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
-}
-
-@font-face {
-  font-family: 'Amiri';
-  src: url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-}
-
-@font-face {
-  font-family: 'Noto Kufi Arabic';
-  src: url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap');
-}
-
-.watermark-text {
-  font-family: 'El Messiri', 'Noto Kufi Arabic', serif;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #000000;
-}
-
-.fancy-border {
-  position: relative;
-  border: 8px solid black;
-  box-shadow: 0 0 0 2px gold, 0 0 0 4px black, 0 0 15px rgba(0,0,0,0.5);
-}
-
-.fancy-border::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  right: -12px;
-  bottom: -12px;
-  border: 1px solid rgba(218, 165, 32, 0.3);
-  pointer-events: none;
-}
-
-.report-border {
-  position: relative;
-  border: 12px solid black;
-  box-shadow: 0 0 0 3px gold, 0 0 0 6px black, 0 0 20px rgba(0,0,0,0.7);
-  padding: 20px;
-  background-color: white;
-}
-
-.report-header {
-  border: 4px solid black;
-  padding: 15px;
-  margin-bottom: 20px;
-  background-color: #f8f8f8;
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-}
-
-.report-photo {
-  border: 3px solid black;
-  border-radius: 50%;
-  overflow: hidden;
-  width: 120px;
-  height: 120px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.report-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-}
-
-.report-table th, .report-table td {
-  border: 2px solid black;
-  padding: 8px;
-  text-align: center;
-}
-
-.report-table th {
-  background-color: #f0f0f0;
-}
-
-.report-watermark {
-  position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 24px;
-  color: #000000;
-  opacity: 0.2;
-  transform: rotate(-5deg);
-  font-family: 'El Messiri', 'Noto Kufi Arabic', serif;
-  font-weight: bold;
-  pointer-events: none;
-}
-
-.verse-text {
-  font-family: 'Amiri', serif;
-  font-weight: bold;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  color: #000000;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.verse-reference {
-  font-family: 'Noto Kufi Arabic', serif;
-  font-weight: 500;
-  color: #4b5563;
-}
-
-.verse-explanation {
-  font-family: 'Noto Kufi Arabic', serif;
-  line-height: 1.6;
-  text-align: justify;
-}
-
-.saint-card {
-  border: 2px solid #000000;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.saint-header {
-  background-color: #1e3a8a;
-  color: white;
-  padding: 0.75rem;
-  font-family: 'El Messiri', serif;
-  font-weight: bold;
-  text-align: center;
-  font-size: 1.25rem;
-}
-
-.saint-content {
-  padding: 1rem;
-  font-family: 'Amiri', serif;
-}
-
-.saint-name {
-  font-family: 'El Messiri', serif;
-  font-weight: bold;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #1e3a8a;
-}
-
-.saint-date {
-  font-family: 'Noto Kufi Arabic', serif;
-  color: #4b5563;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-
-.saint-description {
-  font-family: 'Amiri', serif;
-  line-height: 1.6;
-  text-align: justify;
-}
 `
 
 type Student = {
@@ -298,273 +161,197 @@ const months = [
   "ديسمبر",
 ]
 
-// Bible verses data
+// Updated Bible verses data for April 2025
 const bibleVerses = [
   {
     date: "8 مايو",
     day: "الخميس",
-    verse: "لَكِنِ الَّذِينَ يَتَرَجَّونَ الرَّبَّ يُجَدِّدُونَ قُوَّتَهُمْ.",
+    verse: "لَكِنِ الَّذِينَ يَتَرَجُّونَ الرَّبَّ يُجَدِّدُونَ قُوَّتَهُمْ.",
     reference: "إشعياء 40: 31",
-    explanation:
-      "في هذه الآية، يذكرنا النبي إشعياء بأن الذين يضعون رجاءهم في الرب سيجددون قوتهم باستمرار. عندما نشعر بالتعب والإرهاق، فإن الاتكال على الله يمنحنا قوة متجددة لمواصلة المسيرة. هذا وعد إلهي بأن الله يعطي قوة للمتعبين وشدة لعديمي القوة، فهو مصدر القوة الحقيقية التي لا تنضب.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "9 مايو",
     day: "الجمعة",
     verse: "قَدْ غَلَبْتُمُوهُمْ، لأَنَّ الَّذِي فِيكُمْ أَعْظَمُ مِنَ الَّذِي فِي الْعَالَمِ.",
     reference: "1 يوحنا 4: 4",
-    explanation:
-      "تؤكد هذه الآية على قوة الله العاملة فينا، فالروح القدس الساكن في المؤمنين أعظم من قوى الشر في العالم. مهما كانت التحديات والصعوبات التي نواجهها، فإن الله الذي يسكن فينا أقوى من كل قوى الظلام. هذه الآية تمنحنا الثقة والشجاعة لمواجهة تجارب الحياة، عالمين أن النصرة مضمونة لأن الله معنا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "10 مايو",
     day: "السبت",
     verse: "اَلرَّبُّ يُحَافِظُ عَلَى جَمِيعِ مُحِبِّيهِ.",
     reference: "مزمور 145: 20",
-    explanation:
-      "يطمئننا داود النبي في هذه الآية بأن الله يحافظ على كل من يحبه. محبة الله ليست مجرد عاطفة، بل هي حماية ورعاية مستمرة. عندما نحب الله ونسير في طرقه، فإنه يحيطنا بعنايته الإلهية ويحفظنا من كل شر. هذه الآية تذكرنا بأن الله أمين في وعوده وأنه يرعى أولاده المحبين له بأمانة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "11 مايو",
     day: "الأحد",
     verse: "اُطْلُبُوا وَتُعْطَوْا. اُقْرَعُوا وَيُفْتَحُ لَكُمْ.",
     reference: "متى 7: 7",
-    explanation:
-      "في هذه الآية، يعلمنا السيد المسيح أهمية المثابرة في الصلاة. الطلب والقرع يشيران إلى الاستمرار في الصلاة بإيمان وثقة. الله يستجيب لصلواتنا، ليس دائماً بالطريقة التي نتوقعها، ولكن دائماً بما هو أفضل لنا. هذه الآية تشجعنا على الاستمرار في التواصل مع الله، واثقين أنه يسمع ويستجيب لصلواتنا الصادقة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "12 مايو",
     day: "الإثنين",
     verse: "اَلرَّبُّ قُوَّتِي وَتَرْنِيمَتِي، وَقَدْ صَارَ لِي خَلاَصًا.",
     reference: "خروج 15: 2",
-    explanation:
-      "هذه الآية جزء من ترنيمة موسى بعد عبور البحر الأحمر، وهي تعبر عن الفرح والامتنان لله على خلاصه العظيم. الرب هو مصدر قوتنا وسبب فرحنا وترنيمنا. عندما نواجه صعوبات الحياة، يمكننا أن نتذكر أن الله هو خلاصنا وأنه قادر على تحويل أصعب المواقف إلى أسباب للتسبيح والشكر.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "13 مايو",
     day: "الثلاثاء",
     verse: "فِي الضِّيقِ دَعَوْتَ، فَنَجَّيْتُكَ.",
     reference: "مزمور 81: 7",
-    explanation:
-      "تذكرنا هذه الآية بأن الله يستجيب لصرخاتنا في وقت الضيق. عندما نكون في أصعب الظروف، فإن الله قريب منا ومستعد للاستماع والاستجابة. الضيقات ليست نهاية المطاف، بل هي فرصة لاختبار قوة الله وتدخله في حياتنا. مهما كانت الصعوبات التي نواجهها، يمكننا أن ندعو الله بثقة، عالمين أنه سينجينا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "14 مايو",
     day: "الأربعاء",
     verse: "لَا يَتْرُكُكَ وَلاَ يَخْذُلُكَ.",
     reference: "تثنية 31: 6",
-    explanation:
-      "هذه الآية هي وعد إلهي بالحضور المستمر والدعم الدائم. الله لا يتركنا أبداً، حتى في أحلك الظروف وأصعب الأوقات. عندما نشعر بالوحدة أو الخذلان من الآخرين، يمكننا أن نتذكر أن الله معنا دائماً. هذا الوعد يمنحنا الشجاعة والثقة لمواجهة تحديات الحياة، عالمين أن الله لن يتخلى عنا أبداً.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "15 مايو",
     day: "الخميس",
     verse: "اَلرَّبُّ يُعِينُهُمْ وَيُنَجِّيهِمْ.",
     reference: "مزمور 37: 40",
-    explanation:
-      "تؤكد هذه الآية على عون الله ونجدته للمتكلين عليه. الله يعين أولاده في وقت الضيق وينجيهم من الشدائد. هذه ليست مجرد كلمات تشجيع، بل هي حقيقة اختبرها الكثيرون عبر العصور. عندما نواجه صعوبات تفوق قدراتنا، يمكننا أن نتكل على الله، واثقين أنه سيعيننا وينجينا في الوقت المناسب.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "16 مايو",
     day: "الجمعة",
     verse: "لِكُلِّ شَيْءٍ زَمَانٌ، وَلِكُلِّ أَمْرٍ تَحْتَ السَّمَاوَاتِ وَقْتٌ.",
     reference: "جامعة 3: 1",
-    explanation:
-      "تذكرنا هذه الآية بحكمة الله في توقيت الأحداث في حياتنا. قد لا نفهم دائماً لماذا تحدث بعض الأمور في وقت معين، لكن الله لديه خطة وتوقيت مثالي لكل شيء. هذه الآية تعلمنا الصبر والثقة في توقيت الله، حتى عندما لا نفهم ما يحدث. الله يعمل كل شيء حسناً في وقته المناسب، وهذا يمنحنا السلام وسط تقلبات الحياة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "17 مايو",
     day: "السبت",
     verse: "إِنَّكَ تُحِيطُ بِي مِنْ كُلِّ جِهَةٍ، وَتَضَعُ يَدَكَ عَلَيَّ.",
     reference: "مزمور 139: 5",
-    explanation:
-      "تصور هذه الآية محبة الله الشاملة وحمايته الكاملة لنا. الله يحيط بنا من كل جانب، ويضع يده علينا للحماية والتوجيه. هذه الصورة تمنحنا شعوراً بالأمان والطمأنينة وسط عالم مضطرب. مهما كانت المخاوف أو التحديات التي نواجهها، فإن الله يحيط بنا بمحبته ويحمينا بقوته، وهذا يمنحنا السلام والثقة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "18 مايو",
     day: "الأحد",
     verse: "اَلرَّبُّ يُبَارِكُ شَعْبَهُ بِالسَّلاَمِ.",
     reference: "مزمور 29: 11",
-    explanation:
-      "تؤكد هذه الآية على بركة السلام التي يمنحها الله لشعبه. السلام هو عطية ثمينة من الله، وهو ليس مجرد غياب للمشاكل، بل هو طمأنينة داخلية وسط العواصف. الله يبارك أولاده بسلام يفوق كل عقل، سلام لا يتأثر بالظروف المحيطة. هذه البركة متاحة لكل من يثق في الله ويسير في طرقه.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "19 مايو",
     day: "الإثنين",
     verse: "مَا لَمْ تَرَهُ عَيْنٌ، وَمَا لَمْ تَسْمَعْ بِهِ أُذُنٌ، مَا أَعَدَّهُ اللهُ لِلَّذِينَ يُحِبُّونَهُ.",
     reference: "1 كورنثوس 2: 9",
-    explanation:
-      "تتحدث هذه الآية عن عظمة ما أعده الله لمحبيه، وهو أمر يفوق كل تصور بشري. الله أعد لنا بركات وأمجاداً تفوق ما يمكن أن نراه أو نسمعه أو نتخيله. هذه الآية تشجعنا على محبة الله والثقة في وعوده، عالمين أن ما ينتظرنا أعظم بكثير مما نختبره الآن. مهما كانت صعوبات الحياة الحالية، فإن ما أعده الله لنا يستحق كل انتظار.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "20 مايو",
     day: "الثلاثاء",
     verse: "اَلرَّبُّ مَلْجَأٌ لِلْمَسَاكِينِ، مَلْجَأٌ فِي أَزْمِنَةِ الضِّيقِ.",
     reference: "إشعياء 25: 4",
-    explanation:
-      "تصور هذه الآية الله كملجأ وحصن في وقت الضيق. عندما تعصف بنا رياح الحياة وعواصفها، يمكننا أن نلجأ إلى الله ونجد فيه الأمان والحماية. الله يهتم بشكل خاص بالمساكين والمحتاجين، ويقدم لهم ملجأً في وقت الضيق. هذه الآية تشجعنا على اللجوء إلى الله في كل ظروفنا، واثقين أنه سيكون ملجأنا وحصننا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "21 مايو",
     day: "الأربعاء",
     verse: "لَا تَخَافُوا لأَنِّي مَعَكُمْ.",
     reference: "إشعياء 43: 5",
-    explanation:
-      "تحمل هذه الآية وعداً إلهياً بالحضور والمعية في مواجهة المخاوف. الخوف هو شعور طبيعي، لكن وجود الله معنا يمنحنا الشجاعة لمواجهة مخاوفنا. عندما نتذكر أن الله معنا، تتلاشى مخاوفنا وتحل محلها الثقة والطمأنينة. هذه الآية تدعونا إلى التخلي عن الخوف والاتكال على حضور الله المستمر في حياتنا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "22 مايو",
     day: "الخميس",
     verse: "اَلرَّبُّ نُورِي وَخَلاَصِي.",
     reference: "مزمور 27: 1",
-    explanation:
-      "يصف داود النبي في هذه الآية الله بأنه النور والخلاص في حياته. النور يبدد الظلام ويرشد الطريق، والخلاص ينقذ من الخطر ويمنح الأمان. عندما نواجه ظلام الشك أو الخوف أو الحزن، يمكننا أن نتذكر أن الله هو نورنا الذي يبدد كل ظلام. وعندما نواجه تهديدات أو مخاطر، يمكننا أن نثق في الله كمصدر خلاصنا وأماننا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "23 مايو",
     day: "الجمعة",
     verse: "تَشَدَّدُوا وَتَشَجَّعُوا، لَا تَخَافُوا.",
     reference: "تثنية 31: 6",
-    explanation:
-      "تحمل هذه الآية دعوة إلهية للتشدد والتشجع وعدم الخوف. الله لا يريدنا أن نعيش في خوف أو قلق، بل يدعونا إلى التحلي بالشجاعة والقوة. هذه الدعوة مبنية على وعد الله بحضوره معنا وعدم تركنا. عندما نواجه تحديات تبدو أكبر من قدراتنا، يمكننا أن نستمد القوة والشجاعة من وعود الله وحضوره معنا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "24 مايو",
     day: "السبت",
     verse: "لَا تَتْرُكْ قَلْبَكَ يَفْشَلُ.",
     reference: "أمثال 4: 23",
-    explanation:
-      "تذكرنا هذه الآية بأهمية حفظ القلب والعناية به. القلب هو مركز العواطف والأفكار والقرارات، ومنه تنبع ينابيع الحياة. عندما نحفظ قلوبنا من الأفكار السلبية والمشاعر الهدامة، نحمي حياتنا كلها. هذه الآية تدعونا إلى الانتباه لما ندخله إلى قلوبنا من أفكار ومشاعر، واختيار ما يبني ويشجع ويقوي إيماننا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "25 مايو",
     day: "الأحد",
     verse: "اَلرَّبُّ حَارِسُكَ، الرَّبُّ ظِلُّكَ عَنْ يَدِكَ الْيُمْنَى.",
     reference: "مزمور 121: 5",
-    explanation:
-      "تصور هذه الآية الله كحارس أمين وظل واقٍ من حرارة الشمس. الحارس يحمي ويسهر، والظل يوفر الراحة والحماية. الله يحرسنا من كل خطر ويحمينا من كل أذى، وهو قريب منا كظل عن يدنا اليمنى. هذه الصورة تمنحنا شعوراً بالأمان والحماية المستمرة. مهما كانت المخاطر التي نواجهها، فإن الله حارسنا الأمين الذي لا ينعس ولا ينام.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "26 مايو",
     day: "الإثنين",
     verse: "قَدْ جَعَلْتُ الرَّبَّ أَمَامِي فِي كُلِّ حِينٍ.",
     reference: "مزمور 16: 8",
-    explanation:
-      "يشارك داود النبي في هذه الآية سر قوته وثباته، وهو جعل الرب أمامه في كل حين. عندما نضع الله في مركز حياتنا ونتذكر حضوره باستمرار، نختبر الثبات والاستقرار. هذه الآية تدعونا إلى تذكر حضور الله في كل لحظة من لحظات حياتنا، في الفرح والحزن، في النجاح والفشل. عندما نجعل الرب أمامنا في كل حين، نختبر سلاماً وفرحاً لا يتزعزع.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "27 مايو",
     day: "الثلاثاء",
     verse: "اَلرَّبُّ يُحَارِبُ عَنْكُمْ، وَأَنْتُمْ تَصْمُتُونَ.",
     reference: "خروج 14: 14",
-    explanation:
-      "تذكرنا هذه الآية بأن الله يحارب عنا، ونحن مدعوون للثقة والانتظار بصمت. عندما واجه بنو إسرائيل البحر أمامهم وجيش فرعون خلفهم، قال لهم موسى هذه الكلمات. الله لا يتركنا نواجه معاركنا وحدنا، بل هو يحارب عنا. هذه الآية تدعونا إلى الثقة في قوة الله وقدرته على التدخل في أصعب المواقف، حتى عندما تبدو الأمور مستحيلة من وجهة نظرنا البشرية.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "28 مايو",
     day: "الأربعاء",
     verse: "اُثْبُتُوا فِي الإِيمَانِ، تَشَدَّدُوا.",
     reference: "1 كورنثوس 16: 13",
-    explanation:
-      "تحمل هذه الآية دعوة للثبات في الإيمان والتشدد في مواجهة التحديات. الثبات في الإيمان يعني الاستمرار في الثقة بالله والاتكال عليه مهما كانت الظروف. التشدد يعني التحلي بالشجاعة والقوة في مواجهة الصعوبات. هذه الآية تشجعنا على عدم التراجع أو الاستسلام عندما نواجه تحديات، بل الثبات في إيماننا والتشدد بقوة الله العاملة فينا.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "29 مايو",
     day: "الخميس",
     verse: "لَا يَخْذُلُكَ وَلاَ يَتْرُكُكَ.",
     reference: "يشوع 1: 5",
-    explanation:
-      "تحمل هذه الآية وعداً إلهياً بعدم الخذلان أو الترك. الله أمين في وعوده، وهو لا يتخلى عن أولاده أبداً. عندما نشعر بالوحدة أو الخذلان من الآخرين، يمكننا أن نتذكر هذا الوعد الإلهي. الله معنا في كل خطوة من خطوات حياتنا، وهو لن يتركنا أو يتخلى عنا مهما كانت الظروف. هذا الوعد يمنحنا الثقة والطمأنينة في رحلة الحياة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "30 مايو",
     day: "الجمعة",
     verse: "اَلرَّبُّ يَسْمَعُ، وَيُنْقِذُكَ.",
     reference: "مزمور 34: 17",
-    explanation:
-      "تؤكد هذه الآية على استجابة الله لصرخات أولاده وتدخله لإنقاذهم. الله ليس إلهاً بعيداً لا يسمع صلواتنا، بل هو قريب يسمع ويستجيب. عندما نصرخ إلى الله في ضيقاتنا، فإنه يسمع ويتدخل لإنقاذنا. هذه الآية تشجعنا على الصلاة بثقة، عالمين أن الله يسمع ويستجيب في الوقت المناسب وبالطريقة المناسبة.",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
   {
     date: "31 مايو",
     day: "السبت",
     verse: "إِنَّ اللهَ لَنَا مَلْجَأٌ وَقُوَّةٌ، عَوْنًا فِي الضِّيقَاتِ.",
     reference: "مزمور 46: 1",
-    explanation:
-      "تصف هذه الآية الله بأنه ملجأ وقوة وعون في الضيقات. الملجأ هو مكان الأمان والحماية، والقوة هي مصدر الدعم والتمكين، والعون هو المساعدة في وقت الحاجة. الله يوفر لنا كل هذه الأمور في وقت الضيق. مهما كانت الصعوبات التي نواجهها، يمكننا أن نلجأ إلى الله ونجد فيه الأمان والقوة والعون. هذه الآية تشجعنا على الثقة في الله وسط العواصف، عالمين أنه معنا وأنه قادر على مساعدتنا.",
-  },
-]
-
-// Saints data
-const dailySaints = [
-  {
-    date: "8 مايو",
-    name: "القديس أرسانيوس معلم أولاد الملوك",
-    title: "معلم أولاد الملوك",
-    description:
-      "ولد القديس أرسانيوس في روما من أبوين مسيحيين غنيين، وتعلم العلوم الدينية والفلسفية. كان معلماً لأولاد الإمبراطور ثيؤدوسيوس الكبير، أركاديوس وأنوريوس. بعد أن سمع صوتاً يقول له: 'اهرب من الناس تخلص'، ترك القصر وذهب إلى برية شيهيت بمصر حيث عاش حياة النسك والعبادة. اشتهر بصمته وحكمته، وكان يقول: 'كثيراً ما ندمت على الكلام، أما على الصمت فلم أندم قط'. عاش أكثر من 95 عاماً في النسك والعبادة، وتنيح بسلام عام 445م.",
-  },
-  {
-    date: "9 مايو",
-    name: "الشهيد إيسيذوروس الأنطاكي",
-    title: "جندي الإيمان",
-    description:
-      "ولد القديس إيسيذوروس في أنطاكية من أبوين مسيحيين. كان جندياً في الجيش الروماني في عهد الإمبراطور دقلديانوس. عندما اكتشف الوالي أنه مسيحي، حاول إقناعه بالتخلي عن إيمانه وتقديم البخور للأوثان، لكنه رفض بشجاعة. تعرض لتعذيب شديد، ثم قطعوا رأسه ونال إكليل الشهادة. اشتهر بمعجزات كثيرة حدثت بعد استشهاده، وبنيت كنائس كثيرة على اسمه في مصر وسوريا.",
-  },
-  {
-    date: "10 مايو",
-    name: "القديس بيمن المتوحد",
-    title: "نجم البرية",
-    description:
-      "ولد القديس بيمن (باخوميوس) في صعيد مصر من أسرة فقيرة. ترك العالم وذهب إلى برية شيهيت حيث ترهب وعاش حياة النسك الشديد. اشتهر بحكمته وإرشاداته الروحية، وكان يقول: 'إذا رأيت خطايا أخيك، فاستر عليه، وإذا رأيت فضائله فأخبر بها الآخرين'. جاء إليه الكثيرون من كل مكان ليستمعوا إلى تعاليمه وإرشاداته. عاش أكثر من 70 عاماً في النسك والعبادة، وتنيح بسلام في القرن الرابع الميلادي.",
-  },
-  {
-    date: "11 مايو",
-    name: "الشهيد فيلوثاوس الأنطاكي",
-    title: "شاهد الحق",
-    description:
-      "ولد القديس فيلوثاوس في أنطاكية من أبوين وثنيين، لكنه تعرف على المسيحية وآمن بالسيد المسيح. كان طبيباً ماهراً، واستخدم مهنته لخدمة الفقراء والمحتاجين. في عهد اضطهاد الإمبراطور دقلديانوس للمسيحيين، تم القبض عليه واعترف بإيمانه بالمسيح. تعرض لتعذيب شديد، لكنه ظل ثابتاً على إيمانه. أخيراً قطعوا رأسه ونال إكليل الشهادة عام 303م. ظهرت من جسده معجزات كثيرة، وبنيت كنيسة على اسمه في أنطاكية.",
-  },
-  {
-    date: "12 مايو",
-    name: "القديس إبيفانيوس أسقف قبرص",
-    title: "عمود الأرثوذكسية",
-    description:
-      "ولد القديس إبيفانيوس في فلسطين من أبوين يهوديين، ثم اعتنق المسيحية. درس في الإسكندرية وتتلمذ على يد القديس أنطونيوس الكبير. أسس ديراً في فلسطين وترأسه لمدة 30 عاماً. ثم اختير أسقفاً لقبرص حيث خدم لمدة 36 عاماً. كان مدافعاً قوياً عن الإيمان الأرثوذكسي ضد الهرطقات، وكتب كتباً كثيرة في الدفاع عن الإيمان. تنيح بسلام عام 403م عن عمر يناهز 115 عاماً. تعيد له الكنيسة في 12 مايو من كل عام.",
-  },
-  {
-    date: "13 مايو",
-    name: "القديسة تكلا هيمانوت الحبشي",
-    title: "كوكب الحبشة المنير",
-    description:
-      "ولد القديس تكلا هيمانوت في الحبشة (إثيوبيا) عام 1215م من أبوين تقيين. منذ صغره أظهر تقوى وحباً للكتاب المقدس. ترهب في سن مبكرة وعاش حياة النسك الشديد. قام بتبشير مناطق كثيرة في الحبشة، وأسس ديراً شهيراً هناك. كان له دور كبير في نشر المسيحية في الحبشة وتثبيت الإيمان الأرثوذكسي. اشتهر بمعجزات كثيرة وبحياة الصلاة والصوم. تنيح بسلام عام 1313م عن عمر يناهز 98 عاماً. تعتبره الكنيسة الإثيوبية من أعظم قديسيها.",
-  },
-  {
-    date: "14 مايو",
-    name: "الشهيد إسحق الدفراوي",
-    title: "شهيد الصعيد",
-    description:
-      "ولد القديس إسحق في قرية دفرة بالصعيد المصري من أبوين مسيحيين تقيين. كان فلاحاً بسيطاً يعمل في الأرض، لكنه كان غنياً بإيمانه ومحبته للمسيح. في عهد الاضطهاد الروماني للمسيحيين، تم القبض عليه واعترف بإيمانه بالمسيح. حاول الوالي إقناعه بالتخلي عن إيمانه وتقديم البخور للأوثان، لكنه رفض بشجاعة. تعرض لتعذيب شديد، ثم قطعوا رأسه ونال إكليل الشهادة. بنيت كنيسة على اسمه في قريته، وتحتفل الكنيسة بتذكار استشهاده في 14 مايو",
+    explanation: "شوف ربنا بيقولك اي واسمع كلامـــــه ..!",
   },
 ]
 
 // App version and updates
 const APP_VERSION = "1.0.0"
-const APP_UPDATES = {
-  "1.0.3": {
-    version: "1.0.3",
-    title: "تحديث شامل",
-    description: "تم إضافة مجموعة من الميزات الجديدة لتحسين تجربة المستخدم",
-    features: [
-      "إضافة الوضع الليلي (الداكن) للتطبيق",
-      "إمكانية تصدير البيانات بصيغة Excel",
-      "إضافة نظام تنبيهات للمناسبات والاجتماعات",
-      "إمكانية مشاركة التقارير عبر الواتساب",
-    ],
-  },
-}
+const APP_UPDATES = {}
 
-// QR Code URL and Church logo
+// Usage instructions image
+const USAGE_INSTRUCTIONS_IMAGE = "/placeholder.svg?height=800&width=600"
+
+// صور الأحداث المقدسة
+const BLIND_MAN_IMAGE =
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-qSogjM7UD6HNbrnRwhSma9pmXCYqK3.png"
+const MONDAY_HOLY_WEEK_IMAGE =
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EptuZVUw0FnReChM9u8z4eZfXuzc2i.png"
+const TUESDAY_HOLY_WEEK_IMAGE =
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-9l2eFaIlo6vT6KzC81wGiZQlXAkQs3.png"
+
+// QR Code URL - This would be a real QR code in a production app
 const QR_CODE_URL = "/placeholder.svg?height=100&width=100"
+
+// Church logo
 const CHURCH_LOGO = "/church-logo.png"
 
 export default function AttendanceTracker() {
@@ -578,7 +365,6 @@ export default function AttendanceTracker() {
   const [commitment, setCommitment] = useState(0)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [notes, setNotes] = useState("")
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const [hasBorder, setHasBorder] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
@@ -588,8 +374,12 @@ export default function AttendanceTracker() {
   const [showPrintConfirm, setShowPrintConfirm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const reportCanvasRef = useRef<HTMLCanvasElement>(null)
+  const excelExportRef = useRef<HTMLAnchorElement>(null)
 
   const { toast } = useToast()
+
+  // Add state for the Synaxarium dialog
+  const [showSynaxarium, setShowSynaxarium] = useState(false)
 
   // Get current date for Bible verse and special events
   const today = new Date()
@@ -599,50 +389,164 @@ export default function AttendanceTracker() {
 
   // Find the verse for today's date
   const getCurrentVerse = () => {
+    // First try to find by exact date
     const verseByDate = bibleVerses.find((v) => v.date === currentDate)
     if (verseByDate) return verseByDate
+
+    // If not found, use the closest date in April
+    if (currentMonth === 4) {
+      // Find the closest date
+      const aprilVerses = bibleVerses.filter((v) => v.date.includes("أبريل"))
+      if (aprilVerses.length === 0) return bibleVerses[0]
+
+      // Extract day numbers and find closest
+      const dayNumbers = aprilVerses.map((v) => {
+        const dayStr = v.date.split(" ")[0]
+        return Number.parseInt(dayStr, 10)
+      })
+
+      // Find closest day
+      let closestDay = dayNumbers[0]
+      let minDiff = Math.abs(currentDay - closestDay)
+
+      for (let i = 1; i < dayNumbers.length; i++) {
+        const diff = Math.abs(currentDay - dayNumbers[i])
+        if (diff < minDiff) {
+          minDiff = diff
+          closestDay = dayNumbers[i]
+        }
+      }
+
+      return aprilVerses[dayNumbers.indexOf(closestDay)]
+    }
+
+    // Default to first verse if nothing matches
     return bibleVerses[0]
   }
 
   const currentVerse = getCurrentVerse()
 
-  // Get current saint
-  const getCurrentSaint = () => {
-    const saintByDate = dailySaints.find((s) => s.date === currentDate)
-    if (saintByDate) return saintByDate
-    return dailySaints[0]
+  // Check for special dates
+  const isHolyWeek = () => {
+    const day = today.getDate()
+    const month = today.getMonth() + 1 // JavaScript months are 0-indexed
+    const hour = today.getHours()
+
+    // April 13th after 6 PM or between April 14-19
+    return month === 4 && ((day === 13 && hour >= 18) || (day >= 14 && day <= 19))
   }
 
-  const currentSaint = getCurrentSaint()
+  const isEaster = () => {
+    const day = today.getDate()
+    const month = today.getMonth() + 1
+
+    // April 20th
+    return month === 4 && day === 20
+  }
+
+  const isBlindManWeek = () => {
+    const day = today.getDate()
+    const month = today.getMonth() + 1
+
+    // Until April 11th
+    return month === 4 && day <= 11
+  }
+
+  const isHolyMonday = () => {
+    const day = today.getDate()
+    const month = today.getMonth() + 1
+
+    // April 14th
+    return month === 4 && day === 14
+  }
+
+  const isHolyTuesday = () => {
+    const day = today.getDate()
+    const month = today.getMonth() + 1
+
+    // April 15th
+    return month === 4 && day === 15
+  }
+
+  // Get special text based on date for watermark
+  const getSpecialTextForWatermark = () => {
+    return "الكمبيوتر وتكنلوجيا المعلومات والآتصالآت"
+  }
 
   // Special Text Watermark component
   const SpecialTextWatermark = () => {
+    const watermarkText = getSpecialTextForWatermark()
+
+    // Special styling for Holy Week (mourning)
+    const holyWeekStyle = isHolyWeek()
+      ? {
+          color: "#4a4a4a",
+          opacity: 0.4,
+          animation: "mourning-pulse 4s ease-in-out infinite",
+        }
+      : {}
+
+    // Special styling for Easter (celebration)
+    const easterStyle = isEaster()
+      ? {
+          color: "#ffd700",
+          opacity: 0.4,
+          animation: "celebration 2s ease-in-out infinite",
+        }
+      : {}
+
+    // Default style
+    const defaultStyle = {
+      color: "#3b82f6",
+      opacity: 0.3,
+    }
+
+    // Choose the appropriate style
+    const styleToUse = isHolyWeek() ? holyWeekStyle : isEaster() ? easterStyle : defaultStyle
+
     return (
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden">
         <div className="text-center w-full flex flex-col items-center justify-center py-10">
           <div className="flex items-center justify-center">
             <h1
-              className="text-6xl md:text-7xl font-extrabold watermark-text"
+              className={`text-6xl md:text-7xl font-extrabold transform ${isHolyWeek() ? "animate-mourning" : isEaster() ? "animate-celebration" : ""}`}
               style={{
-                color: "#000000",
-                opacity: 0.5,
+                fontFamily: "'El Messiri', 'Noto Kufi Arabic', 'Amiri', serif",
+                whiteSpace: "nowrap",
+                textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
+                ...styleToUse,
                 textAlign: "center",
               }}
             >
-              الكمـــــــبيوتر وتكنلوجيا المعلومات والآتصالآت
+              {watermarkText}
             </h1>
             <span
               className="text-6xl md:text-7xl font-extrabold ml-4"
               style={{
                 fontFamily: "'Arial Black', 'Helvetica', sans-serif",
                 textShadow: "3px 3px 6px rgba(0,0,0,0.3)",
-                color: "#000000",
+                color: "#22c55e", // Green color
                 opacity: 0.5,
               }}
             >
-              VS
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-7c.83 0 1.5-.67 1.5-1.5S10.33 10 9.5 10 8 10.67 8 11.5 8.67 13 9.5 13zm5 0c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-2.5 3c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+              </svg>
             </span>
           </div>
+
+          {isEaster() && (
+            <h2
+              className="text-4xl md:text-5xl font-extrabold mt-2 text-yellow-500 animate-celebration"
+              style={{
+                fontFamily: "'Noto Kufi Arabic', 'Amiri', serif",
+                textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
+                opacity: 0.6,
+              }}
+            >
+              المسيـــــــــــــح قام بالحقيقية قــام
+            </h2>
+          )}
         </div>
         <div className="absolute bottom-2 right-2 text-gray-500 font-bold text-sm">beshoymorad</div>
       </div>
@@ -663,12 +567,15 @@ export default function AttendanceTracker() {
       setStudents(JSON.parse(savedStudents))
     }
 
-    // Show update dialog
-    setShowUpdateDialog(true)
-    localStorage.setItem("lastUpdateCheck", Date.now().toString())
-
     // Set border if app version is 1.0.3 or higher
-    setHasBorder(true)
+    if (APP_VERSION === "1.0.3") {
+      setHasBorder(true)
+    }
+
+    // Force dark mode during Holy Week
+    if (isHolyWeek()) {
+      setDarkMode(true)
+    }
   }, [])
 
   // Apply dark mode effect
@@ -801,6 +708,21 @@ export default function AttendanceTracker() {
     )
   }
 
+  const updateStudentNotes = (studentId: string, notes: string) => {
+    setStudents(
+      students.map((student) => {
+        if (student.id === studentId) {
+          return {
+            ...student,
+            notes,
+            lastUpdated: new Date().toISOString(),
+          }
+        }
+        return student
+      }),
+    )
+  }
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -812,22 +734,19 @@ export default function AttendanceTracker() {
     }
   }
 
-  const handleUpdateAccept = () => {
-    toast({
-      title: "جاري التحديث",
-      description: "يتم الآن تحديث التطبيق إلى الإصدار الجديد...",
-    })
+  const downloadUsageInstructions = () => {
+    // Create a link element
+    const link = document.createElement("a")
+    link.href = USAGE_INSTRUCTIONS_IMAGE
+    link.download = "دليل_استخدام_التطبيق.png"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 
-    // Simulate update process
-    setTimeout(() => {
-      localStorage.setItem("appVersion", "1.0.3")
-      setShowUpdateDialog(false)
-      setHasBorder(true)
-      toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث التطبيق إلى الإصدار 1.0.3",
-      })
-    }, 2000)
+    toast({
+      title: "تم التحميل",
+      description: "تم تحميل دليل استخدام التطبيق بنجاح",
+    })
   }
 
   const generateStudentReport = (student: Student) => {
@@ -835,6 +754,7 @@ export default function AttendanceTracker() {
     setShowPrintConfirm(true)
   }
 
+  // Update the renderAdvancedReport function to create the report with the requested format
   const renderAdvancedReport = () => {
     if (!selectedStudent || !reportCanvasRef.current) return
 
@@ -844,17 +764,17 @@ export default function AttendanceTracker() {
         const ctx = canvas.getContext("2d")
         if (!ctx) return
 
-        // Set canvas dimensions
-        canvas.width = 800
-        canvas.height = 1000
+        // Set canvas dimensions - make it more phone-friendly
+        canvas.width = 600
+        canvas.height = 800
 
         // Fill background
         ctx.fillStyle = "#ffffff"
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Draw fancy black border
+        // Draw fancy black border - make it stronger
         ctx.strokeStyle = "#000000"
-        ctx.lineWidth = 15
+        ctx.lineWidth = 20
         ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20)
 
         // Add inner border
@@ -862,25 +782,64 @@ export default function AttendanceTracker() {
         ctx.lineWidth = 2
         ctx.strokeRect(25, 25, canvas.width - 50, canvas.height - 50)
 
-        // Add header rectangle with black border
+        // Add QR code at the top left
+        const qrSize = 80
+        const qrX = 50
+        const qrY = 50
+
+        // Draw placeholder for QR code
+        ctx.fillStyle = "#f0f0f0"
+        ctx.fillRect(qrX, qrY, qrSize, qrSize)
+        ctx.strokeStyle = "#000000"
+        ctx.lineWidth = 1
+        ctx.strokeRect(qrX, qrY, qrSize, qrSize)
+
+        // Add pattern inside QR code
+        ctx.fillStyle = "#000000"
+        const cellSize = qrSize / 8
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+            if (Math.random() > 0.5) {
+              ctx.fillRect(qrX + i * cellSize, qrY + j * cellSize, cellSize, cellSize)
+            }
+          }
+        }
+
+        // Add logo at the top right
+        const logoSize = 80
+        const logoX = canvas.width - 50 - logoSize
+        const logoY = 50
+
+        // Draw placeholder for logo
+        ctx.fillStyle = "#22c55e" // Green color
+        ctx.beginPath()
+        ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2)
+        ctx.fill()
+
+        ctx.fillStyle = "#ffffff"
+        ctx.font = "bold 40px Arial"
+        ctx.textAlign = "center"
+        ctx.fillText("VS", logoX + logoSize / 2, logoY + logoSize / 2 + 15)
+
+        // Add header rectangle with student info
         ctx.fillStyle = "#f8f8f8"
-        ctx.fillRect(50, 50, canvas.width - 100, 150)
+        ctx.fillRect(50, 150, canvas.width - 100, 150)
         ctx.strokeStyle = "#000000"
         ctx.lineWidth = 3
-        ctx.strokeRect(50, 50, canvas.width - 100, 150)
+        ctx.strokeRect(50, 150, canvas.width - 100, 150)
 
         // Add student name and info
         ctx.fillStyle = "#000000"
-        ctx.font = "bold 28px 'Noto Kufi Arabic', serif"
+        ctx.font = "bold 24px 'Noto Kufi Arabic', serif"
         ctx.textAlign = "right"
-        ctx.fillText(`الاسم: ${selectedStudent.name}`, canvas.width - 80, 90)
+        ctx.fillText(`الاسم: ${selectedStudent.name}`, canvas.width - 80, 180)
 
         // Add student number (starting with 666)
         const studentNumber = selectedStudent.number.startsWith("666")
           ? selectedStudent.number
           : "666" + selectedStudent.number
-        ctx.font = "bold 20px 'Noto Kufi Arabic', serif"
-        ctx.fillText(`الرقم: ${studentNumber}`, canvas.width - 80, 130)
+        ctx.font = "bold 18px 'Noto Kufi Arabic', serif"
+        ctx.fillText(`الرقم: ${studentNumber}`, canvas.width - 80, 210)
 
         // Add code
         const randomCode =
@@ -888,15 +847,15 @@ export default function AttendanceTracker() {
           Math.floor(Math.random() * 10000)
             .toString()
             .padStart(4, "0")
-        ctx.fillText(`الكود: ${randomCode} من النظــــــام`, canvas.width - 80, 170)
+        ctx.fillText(`الكود: ${randomCode} من النظــــــام`, canvas.width - 80, 240)
 
         // Add birth date
-        ctx.fillText(`تاريخ الميلاد: ${selectedStudent.birthDate}`, canvas.width - 80, 210)
+        ctx.fillText(`تاريخ الميلاد: ${selectedStudent.birthDate}`, canvas.width - 80, 270)
 
         // Draw circular student photo on the left
         const photoX = 120
-        const photoY = 125
-        const photoRadius = 60
+        const photoY = 225
+        const photoRadius = 50
 
         // Draw circular clipping path
         ctx.save()
@@ -931,49 +890,48 @@ export default function AttendanceTracker() {
         }
 
         function finishReport() {
-          // Draw horizontal line
+          // Add attendance rectangle
+          ctx.fillStyle = "#f8f8f8"
+          ctx.fillRect(50, 320, canvas.width - 100, 200)
           ctx.strokeStyle = "#000000"
-          ctx.lineWidth = 2
-          ctx.beginPath()
-          ctx.moveTo(50, 240)
-          ctx.lineTo(canvas.width - 50, 240)
-          ctx.stroke()
+          ctx.lineWidth = 3
+          ctx.strokeRect(50, 320, canvas.width - 100, 200)
 
           // Create attendance table
-          const tableTop = 280
-          const tableWidth = canvas.width - 100
-          const rowHeight = 50
+          const tableTop = 340
+          const tableWidth = canvas.width - 140
+          const rowHeight = 40
           const colWidth = tableWidth / 4
 
           // Draw table header
           ctx.fillStyle = "#f0f0f0"
-          ctx.fillRect(50, tableTop, tableWidth, rowHeight)
+          ctx.fillRect(70, tableTop, tableWidth, rowHeight)
           ctx.strokeStyle = "#000000"
           ctx.lineWidth = 1
-          ctx.strokeRect(50, tableTop, tableWidth, rowHeight)
+          ctx.strokeRect(70, tableTop, tableWidth, rowHeight)
 
           // Draw table header text
           ctx.fillStyle = "#000000"
-          ctx.font = "bold 18px 'Noto Kufi Arabic', serif"
+          ctx.font = "bold 16px 'Noto Kufi Arabic', serif"
           ctx.textAlign = "center"
 
-          ctx.fillText("الجمعة 1", 50 + colWidth * 0.5, tableTop + 30)
-          ctx.fillText("الجمعة 2", 50 + colWidth * 1.5, tableTop + 30)
-          ctx.fillText("الجمعة 3", 50 + colWidth * 2.5, tableTop + 30)
-          ctx.fillText("الجمعة 4", 50 + colWidth * 3.5, tableTop + 30)
+          ctx.fillText("الجمعة 1", 70 + colWidth * 0.5, tableTop + 25)
+          ctx.fillText("الجمعة 2", 70 + colWidth * 1.5, tableTop + 25)
+          ctx.fillText("الجمعة 3", 70 + colWidth * 2.5, tableTop + 25)
+          ctx.fillText("الجمعة 4", 70 + colWidth * 3.5, tableTop + 25)
 
           // Draw vertical lines
           for (let i = 1; i < 4; i++) {
             ctx.beginPath()
-            ctx.moveTo(50 + colWidth * i, tableTop)
-            ctx.lineTo(50 + colWidth * i, tableTop + rowHeight * 2)
+            ctx.moveTo(70 + colWidth * i, tableTop)
+            ctx.lineTo(70 + colWidth * i, tableTop + rowHeight * 2)
             ctx.stroke()
           }
 
           // Draw attendance data
           ctx.fillStyle = "#ffffff"
-          ctx.fillRect(50, tableTop + rowHeight, tableWidth, rowHeight)
-          ctx.strokeRect(50, tableTop + rowHeight, tableWidth, rowHeight)
+          ctx.fillRect(70, tableTop + rowHeight, tableWidth, rowHeight)
+          ctx.strokeRect(70, tableTop + rowHeight, tableWidth, rowHeight)
 
           // Fill attendance data
           ctx.fillStyle = "#000000"
@@ -981,21 +939,21 @@ export default function AttendanceTracker() {
 
           for (let i = 0; i < 4; i++) {
             const status = selectedStudent.fridays[i] ? "✓ حاضر" : "✗ غائب"
-            ctx.fillText(status, 50 + colWidth * (i + 0.5), tableTop + rowHeight + 30)
+            ctx.fillText(status, 70 + colWidth * (i + 0.5), tableTop + rowHeight + 25)
           }
 
           // Draw behavior and commitment section
-          const bcTop = tableTop + rowHeight * 2 + 30
+          const bcTop = tableTop + rowHeight * 2 + 20
 
-          ctx.font = "bold 20px 'Noto Kufi Arabic', serif"
+          ctx.font = "bold 18px 'Noto Kufi Arabic', serif"
           ctx.textAlign = "right"
           ctx.fillText("السلوك:", canvas.width - 80, bcTop)
-          ctx.fillText("الالتزام:", canvas.width - 80, bcTop + 50)
+          ctx.fillText("الالتزام:", canvas.width - 80, bcTop + 40)
 
           // Draw behavior bar
-          const barWidth = 300
+          const barWidth = 250
           const barHeight = 20
-          const barLeft = canvas.width - 400
+          const barLeft = canvas.width - 350
 
           ctx.fillStyle = "#f0f0f0"
           ctx.fillRect(barLeft, bcTop - 15, barWidth, barHeight)
@@ -1012,51 +970,142 @@ export default function AttendanceTracker() {
 
           // Draw commitment bar
           ctx.fillStyle = "#f0f0f0"
-          ctx.fillRect(barLeft, bcTop + 35, barWidth, barHeight)
+          ctx.fillRect(barLeft, bcTop + 25, barWidth, barHeight)
 
           ctx.fillStyle = "#2196f3"
-          ctx.fillRect(barLeft, bcTop + 35, (selectedStudent.commitment / 5) * barWidth, barHeight)
+          ctx.fillRect(barLeft, bcTop + 25, (selectedStudent.commitment / 5) * barWidth, barHeight)
 
           ctx.strokeStyle = "#000000"
-          ctx.strokeRect(barLeft, bcTop + 35, barWidth, barHeight)
+          ctx.strokeRect(barLeft, bcTop + 25, barWidth, barHeight)
 
           ctx.fillStyle = "#000000"
           ctx.textAlign = "left"
-          ctx.fillText(`${selectedStudent.commitment}/5`, barLeft + barWidth + 10, bcTop + 50)
+          ctx.fillText(`${selectedStudent.commitment}/5`, barLeft + barWidth + 10, bcTop + 40)
 
-          // Draw percentage
-          const percentTop = bcTop + 100
+          // Draw percentage with 3D effect
+          const percentTop = 540
           ctx.font = "bold 24px 'Noto Kufi Arabic', serif"
-          ctx.textAlign = "right"
-          ctx.fillText(`النسبة الإجمالية: ${selectedStudent.percentage}%`, canvas.width - 80, percentTop)
+          ctx.textAlign = "center"
 
-          // Draw attendance message
-          const currentFridayIndex = Math.min(3, Math.floor(currentDay / 7))
-          const attendanceMessage = selectedStudent.fridays[currentFridayIndex]
-            ? "هذا الشخص حضر الجمعة الحالية."
-            : "هذا الشخص لم يحضر الجمعة الحالية."
+          // Draw 3D effect for percentage
+          ctx.fillStyle = "#22c55e" // Green shadow
+          ctx.fillText(`النسبة الإجمالية: ${selectedStudent.percentage}%`, canvas.width / 2 + 3, percentTop + 3)
+          ctx.fillStyle = "#000000" // Main text
+          ctx.fillText(`النسبة الإجمالية: ${selectedStudent.percentage}%`, canvas.width / 2, percentTop)
 
-          ctx.font = "20px 'Noto Kufi Arabic', serif"
-          ctx.fillText(attendanceMessage, canvas.width - 80, percentTop + 50)
+          // Draw 3D progress emoji
+          ctx.font = "bold 40px Arial"
+          ctx.fillStyle = "#22c55e" // Green shadow
+          ctx.fillText(getProgressEmoji(selectedStudent.percentage), canvas.width / 2 + 5, percentTop + 50)
+          ctx.fillStyle = "#000000" // Main emoji
+          ctx.fillText(getProgressEmoji(selectedStudent.percentage), canvas.width / 2, percentTop + 45)
+
+          // Add notes if available
+          if (selectedStudent.notes) {
+            const notesTop = percentTop + 80
+            ctx.font = "bold 18px 'Noto Kufi Arabic', serif"
+            ctx.textAlign = "right"
+            ctx.fillText("ملاحظات:", canvas.width - 80, notesTop)
+
+            ctx.font = "16px 'Noto Kufi Arabic', serif"
+
+            // Wrap text for notes
+            const maxWidth = canvas.width - 160
+            const words = selectedStudent.notes.split(" ")
+            let line = ""
+            let lineY = notesTop + 25
+
+            for (let i = 0; i < words.length; i++) {
+              const testLine = line + words[i] + " "
+              const metrics = ctx.measureText(testLine)
+
+              if (metrics.width > maxWidth && i > 0) {
+                ctx.fillText(line, canvas.width - 80, lineY)
+                line = words[i] + " "
+                lineY += 25
+              } else {
+                line = testLine
+              }
+            }
+            ctx.fillText(line, canvas.width - 80, lineY)
+          }
+
+          // Add "فريق النظام بيشوي مراد" at the bottom
+          ctx.font = "bold 16px 'Noto Kufi Arabic', serif"
+          ctx.textAlign = "center"
+          ctx.fillText("فريق النظام بيشوي مراد", canvas.width / 2, canvas.height - 100)
 
           // Add watermark
           ctx.save()
-          ctx.globalAlpha = 0.2
-          ctx.font = "bold 40px 'El Messiri', 'Noto Kufi Arabic', serif"
+          ctx.globalAlpha = 0.1
+          ctx.font = "bold 30px 'El Messiri', 'Noto Kufi Arabic', serif"
           ctx.textAlign = "center"
-          ctx.fillStyle = "#000000"
-          ctx.fillText("الكمـــــــبيوتر وتكنلوجيا المعلومات والآتصالآت", canvas.width / 2, canvas.height - 100)
-          ctx.fillText("VS", canvas.width / 2, canvas.height - 50)
+          ctx.fillText("الكمبيوتر وتكنلوجيا المعلومات والآتصالآت", canvas.width / 2, canvas.height - 60)
           ctx.restore()
 
-          // Add footer
-          ctx.font = "14px 'Noto Kufi Arabic', serif"
-          ctx.textAlign = "center"
-          ctx.fillText("كنيسة الشهيد العظيم مارجرجس والانبا باخوميوس - العصافرة", canvas.width / 2, canvas.height - 30)
-          ctx.fillText("خدمة لاحظ نفسك", canvas.width / 2, canvas.height - 10)
+          // Add "Made by Beshoy Morad" in English at the bottom
+          ctx.font = "12px Arial"
+          ctx.textAlign = "right"
+          ctx.fillText("Made by Beshoy Morad", canvas.width - 60, canvas.height - 30)
+
+          // Add WiFi router icon
+          ctx.fillStyle = "#22c55e" // Green color
+          ctx.beginPath()
+          ctx.arc(canvas.width - 40, canvas.height - 35, 10, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Draw WiFi waves
+          ctx.strokeStyle = "#22c55e"
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(canvas.width - 40, canvas.height - 35, 15, Math.PI, 0)
+          ctx.stroke()
+          ctx.beginPath()
+          ctx.arc(canvas.width - 40, canvas.height - 35, 20, Math.PI, 0)
+          ctx.stroke()
         }
       }
     }, 100)
+  }
+
+  // Update the shareViaWhatsApp function to share directly to the student's number
+  const shareViaWhatsApp = () => {
+    if (!selectedStudent) return
+
+    // Extract the phone number from the student number (remove the 666 prefix)
+    let phoneNumber = selectedStudent.number
+    if (phoneNumber.startsWith("666")) {
+      phoneNumber = phoneNumber.substring(3)
+    }
+
+    // Add Egypt country code if needed
+    if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("2")) {
+      phoneNumber = "2" + phoneNumber
+    }
+
+    // Create a message to share
+    const message = `
+تقرير الطالب: ${selectedStudent.name}
+الرقم: ${selectedStudent.number}
+النسبة الإجمالية: ${selectedStudent.percentage}%
+الحضور: ${selectedStudent.fridays.filter((f) => f).length} من 4 جمعات
+السلوك: ${selectedStudent.behavior}/5
+الالتزام: ${selectedStudent.commitment}/5
+  `
+
+    // Encode the message for WhatsApp
+    const encodedMessage = encodeURIComponent(message)
+
+    // Create WhatsApp URL with the phone number
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
+
+    // Open WhatsApp in a new window
+    window.open(whatsappUrl, "_blank")
+
+    toast({
+      title: "تمت المشاركة",
+      description: "تم فتح واتساب لمشاركة التقرير مع الطالب",
+    })
   }
 
   const downloadStudentReport = () => {
@@ -1088,189 +1137,645 @@ export default function AttendanceTracker() {
     }, 500)
   }
 
+  const exportToExcel = () => {
+    // In a real application, you would generate a proper Excel file
+    // For this example, we'll create a CSV file
+
+    // Create CSV header
+    let csv = "الاسم,الرقم,تاريخ الميلاد,الشهر,الجمعة 1,الجمعة 2,الجمعة 3,الجمعة 4,السلوك,الالتزام,النسبة,الملاحظات\n"
+
+    // Add each student as a row
+    students.forEach((student) => {
+      const row = [
+        student.name,
+        student.number,
+        student.birthDate,
+        student.month,
+        student.fridays[0] ? "حاضر" : "غائب",
+        student.fridays[1] ? "حاضر" : "غائب",
+        student.fridays[2] ? "حاضر" : "غائب",
+        student.fridays[3] ? "حاضر" : "غائب",
+        student.behavior,
+        student.commitment,
+        student.percentage + "%",
+        student.notes || "",
+      ]
+
+      csv += row.join(",") + "\n"
+    })
+
+    // Create a Blob with the CSV data
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+
+    // Create a link to download the CSV
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `تقرير_الطلاب_${new Date().toLocaleDateString()}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "تم التصدير",
+      description: "تم تصدير بيانات الطلاب بنجاح",
+    })
+  }
+
+  const backupData = () => {
+    // Create a backup object with all data
+    const backup = {
+      students,
+      appVersion: localStorage.getItem("appVersion") || APP_VERSION,
+      timestamp: new Date().toISOString(),
+    }
+
+    // Convert to JSON
+    const backupJson = JSON.stringify(backup, null, 2)
+
+    // Create a Blob with the JSON data
+    const blob = new Blob([backupJson], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+
+    // Create a link to download the backup
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `نسخة_احتياطية_${new Date().toLocaleDateString()}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "تم النسخ الاحتياطي",
+      description: "تم حفظ نسخة احتياطية من البيانات بنجاح",
+    })
+  }
+
+  const restoreData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const backup = JSON.parse(event.target?.result as string)
+
+        // Validate backup data
+        if (backup.students && Array.isArray(backup.students)) {
+          setStudents(backup.students)
+
+          toast({
+            title: "تم الاستعادة",
+            description: "تم استعادة البيانات من النسخة الاحتياطية بنجاح",
+          })
+        } else {
+          throw new Error("Invalid backup file")
+        }
+      } catch (error) {
+        toast({
+          title: "خطأ",
+          description: "ملف النسخة الاحتياطية غير صالح",
+          variant: "destructive",
+        })
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  // Filter students based on search term and month filter
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.number.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesMonth = filterMonth === "" || student.month === filterMonth
+
+    return matchesSearch && matchesMonth
+  })
+
+  // Calculate statistics
+  const calculateStats = () => {
+    if (students.length === 0) return null
+
+    const totalStudents = students.length
+    const averageAttendance =
+      (students.reduce((acc, student) => acc + student.fridays.filter((f) => f).length / 4, 0) / totalStudents) * 100
+
+    const averageBehavior = students.reduce((acc, student) => acc + student.behavior, 0) / totalStudents
+    const averageCommitment = students.reduce((acc, student) => acc + student.commitment, 0) / totalStudents
+    const averagePercentage = students.reduce((acc, student) => acc + student.percentage, 0) / totalStudents
+
+    const excellentStudents = students.filter((s) => s.percentage >= 90).length
+    const goodStudents = students.filter((s) => s.percentage >= 75 && s.percentage < 90).length
+    const averageStudents = students.filter((s) => s.percentage >= 60 && s.percentage < 75).length
+    const belowAverageStudents = students.filter((s) => s.percentage < 60).length
+
+    return {
+      totalStudents,
+      averageAttendance: Math.round(averageAttendance),
+      averageBehavior: Math.round(averageBehavior * 10) / 10,
+      averageCommitment: Math.round(averageCommitment * 10) / 10,
+      averagePercentage: Math.round(averagePercentage),
+      excellentStudents,
+      goodStudents,
+      averageStudents,
+      belowAverageStudents,
+    }
+  }
+
+  // Get theme based on special dates
+  const getThemeStyles = () => {
+    if (isHolyWeek()) {
+      return {
+        headerBg: darkMode ? "bg-gray-900" : "bg-gray-800",
+        headerText: "text-gray-300",
+        buttonBg: "bg-gray-700 hover:bg-gray-600",
+        cardBg: darkMode ? "bg-gray-900" : "bg-gray-800",
+        borderColor: "border-gray-700",
+      }
+    } else if (isEaster()) {
+      return {
+        headerBg: darkMode
+          ? "bg-gradient-to-r from-yellow-900 to-yellow-700"
+          : "bg-gradient-to-r from-yellow-600 to-yellow-400",
+        headerText: "text-white",
+        buttonBg: "bg-yellow-600 hover:bg-yellow-500",
+        cardBg: darkMode ? "bg-gray-800" : "bg-white",
+        borderColor: "border-yellow-500",
+      }
+    } else {
+      return {
+        headerBg: darkMode
+          ? "bg-gradient-to-r from-green-900 to-green-700"
+          : "bg-gradient-to-r from-green-600 to-green-800",
+        headerText: "text-white",
+        buttonBg: darkMode ? "bg-green-700 hover:bg-green-600" : "bg-green-600 hover:bg-green-700",
+        cardBg: darkMode ? "bg-gray-800" : "bg-white",
+        borderColor: "border-green-600",
+      }
+    }
+  }
+
+  const themeStyles = getThemeStyles()
+
+  // Component for displaying the special images based on date
+  const SpecialImage = () => {
+    if (isBlindManWeek()) {
+      return (
+        <div className="absolute top-24 right-4 md:right-8 z-10 w-32 md:w-48">
+          <div className="relative">
+            <div className="absolute inset-0 border-4 border-black rounded-lg"></div>
+            <div className="absolute top-0 left-0 right-0 bg-black text-white text-center py-1 text-sm md:text-base font-bold rounded-t-lg">
+              شفاء الآعمــــى
+            </div>
+            <img
+              src={BLIND_MAN_IMAGE || "/placeholder.svg"}
+              alt="شفاء الأعمى"
+              className="rounded-lg border-2 border-gray-300 mt-6"
+            />
+          </div>
+        </div>
+      )
+    } else if (isHolyMonday()) {
+      return (
+        <div className="absolute top-24 right-4 md:right-8 z-10 w-32 md:w-48">
+          <img
+            src={MONDAY_HOLY_WEEK_IMAGE || "/placeholder.svg"}
+            alt="اثنين البصخة"
+            className="rounded-lg border-2 border-gray-300"
+          />
+        </div>
+      )
+    } else if (isHolyTuesday()) {
+      return (
+        <div className="absolute top-24 right-4 md:right-8 z-10 w-32 md:w-48">
+          <img
+            src={TUESDAY_HOLY_WEEK_IMAGE || "/placeholder.svg"}
+            alt="ثلاثاء البصخة"
+            className="rounded-lg border-2 border-gray-300"
+          />
+        </div>
+      )
+    }
+
+    return null
+  }
+
+  // Help, Verse, and Synaxarium Section - Optimized for Mobile
   return (
     <div
-      className={`relative container mx-auto py-4 space-y-6 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} min-h-screen ${hasBorder ? "border-8 border-black" : ""}`}
-      style={{ fontFamily: "'Amiri', 'Noto Kufi Arabic', serif" }}
+      className={`relative container mx-auto py-2 px-2 space-y-4 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} min-h-screen ${hasBorder ? "border-8 border-black" : ""} ${isHolyWeek() ? "bg-gray-900 text-gray-300 animate-holy-week-bg" : ""} ${isEaster() ? "bg-gradient-to-b from-gray-50 to-yellow-50 text-gray-900" : ""}`}
+      style={{ fontFamily: "'Amiri', 'Noto Kufi Arabic', serif", maxWidth: "100%", overflowX: "hidden" }}
     >
-      {/* Add styles */}
-      <style>{styles}</style>
+      <style jsx global>{`
+        ${animateSpinSlow}
+      `}</style>
 
       {/* Special Text Watermark */}
       <SpecialTextWatermark />
 
-      {/* Header with Church Name */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 md:p-6 rounded-lg shadow-lg text-center mb-6 relative z-10">
-        <div className="flex justify-between items-center mb-2">
-          <img src={QR_CODE_URL || "/placeholder.svg"} alt="QR Code" className="h-12 w-12 rounded" />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setDarkMode(!darkMode)}
-            className="text-white hover:bg-blue-700/50"
-          >
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-          <img src={CHURCH_LOGO || "/placeholder.svg"} alt="Church Logo" className="h-16 w-16" />
-        </div>
-        <h1 className="text-xl md:text-3xl font-bold mb-2" style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}>
-          كنيسة الشهيد العظيم مارجرجس والانبا باخوميوس - العصافرة
+      {/* Special Image based on date */}
+      <SpecialImage />
+
+      {/* Top Buttons and Title */}
+      <div className="flex justify-between items-center mb-4 relative z-10">
+        <h1
+          className={`text-2xl md:text-3xl font-extrabold ${themeStyles.headerText}`}
+          style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
+        >
+          نظام خدمة مدارس الآحـــــد
         </h1>
-        <div className="flex items-center justify-center gap-2">
-          <Brain className="h-5 w-5 md:h-6 md:w-6" />
-          <h2 className="text-lg md:text-xl font-semibold" style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}>
-            خدمة لاحظ نفسك
-          </h2>
+        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+          <Button variant="outline" size="icon" onClick={downloadUsageInstructions}>
+            <HelpCircle className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setShowStats(!showStats)}>
+            <Brain className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      {/* Help and Verse Section - Optimized for Mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 relative z-10">
+      {/* Help, Verse, and Synaxarium Section - Optimized for Mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4 relative z-10">
         {/* Help Section */}
         <Dialog>
           <DialogTrigger asChild>
             <Card
-              className={`cursor-pointer ${darkMode ? "hover:bg-gray-800 bg-gray-800" : "hover:bg-blue-50 bg-white"} transition-colors`}
+              className={`cursor-pointer ${darkMode ? "hover:bg-gray-800 bg-gray-800" : "hover:bg-green-50 bg-white"} transition-colors ${isHolyWeek() ? "bg-gray-800 border-gray-700" : ""} ${isEaster() ? "border-yellow-300" : ""}`}
             >
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className={`${darkMode ? "bg-blue-900" : "bg-blue-100"} p-3 rounded-full`}>
-                  <HelpCircle className={`h-6 w-6 md:h-8 md:w-8 ${darkMode ? "text-blue-400" : "text-blue-600"}`} />
+              <CardContent className="p-3 flex items-center gap-2">
+                <div
+                  className={`${darkMode ? "bg-green-900" : "bg-green-100"} p-2 rounded-full ${isHolyWeek() ? "bg-gray-700" : ""} ${isEaster() ? "bg-yellow-100" : ""}`}
+                >
+                  <HelpCircle
+                    className={`h-5 w-5 ${darkMode ? "text-green-400" : "text-green-600"} ${isHolyWeek() ? "text-gray-400" : ""} ${isEaster() ? "text-yellow-600" : ""}`}
+                  />
                 </div>
                 <div className="flex-1">
                   <h3
-                    className={`text-lg font-bold ${darkMode ? "text-blue-400" : "text-blue-800"}`}
+                    className={`text-base font-bold ${darkMode ? "text-green-400" : "text-green-800"} ${isHolyWeek() ? "text-gray-300" : ""} ${isEaster() ? "text-yellow-700" : ""}`}
                     style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
                   >
                     عن التطبيق
                   </h3>
-                  <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
+                  <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs`}>
                     اضغط هنا لمعرفة المزيد عن استخدام التطبيق
                   </p>
                 </div>
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className={`max-w-3xl ${darkMode ? "bg-gray-800 text-white" : "bg-white"}`}>
+          <DialogContent
+            className={`max-w-3xl ${darkMode ? "bg-gray-800 text-white" : "bg-white"} ${isHolyWeek() ? "bg-gray-900 text-gray-300 border-gray-700" : ""} ${isEaster() ? "border-yellow-300" : ""}`}
+          >
             <DialogHeader>
               <DialogTitle
-                className={`text-2xl font-bold text-center mb-4 ${darkMode ? "text-white" : ""}`}
+                className={`text-2xl font-bold text-center mb-4 ${darkMode ? "text-white" : ""} ${isHolyWeek() ? "text-gray-300" : ""} ${isEaster() ? "text-yellow-700" : ""}`}
                 style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
               >
                 عن التطبيق
               </DialogTitle>
             </DialogHeader>
             <div className="text-right" dir="rtl">
-              <h3 className="text-xl font-bold mb-3">تطبيق متابعة الحضور والسلوك</h3>
-              <p className="mb-3">
-                تم تطوير هذا التطبيق بواسطة فريق "الكمـــــــبيوتر وتكنلوجيا المعلومات والآتصالآت" لمساعدة خدام مدارس
-                الأحد في متابعة حضور الطلاب وسلوكهم والتزامهم.
+              <p className="mb-3 text-base leading-relaxed">
+                تم تطوير هذا التطبيق بواسطة: <strong>بيشوي مراد</strong>
               </p>
-              <p className="mb-3">
-                يتيح التطبيق إمكانية تسجيل بيانات الطلاب، ومتابعة حضورهم في الجمعات، وتقييم سلوكهم والتزامهم، وإصدار
-                تقارير مفصلة عن كل طالب.
-              </p>
-              <p className="mb-3">
-                كما يوفر التطبيق آية يومية للتأمل، ومعلومات عن القديسين والشهداء، لتعزيز الجانب الروحي والتعليمي.
-              </p>
-              <h4 className="text-lg font-bold mt-4 mb-2">المطور:</h4>
-              <p className="mb-3">
-                <strong>بيشوي مراد</strong> - مبرمج ومطور تطبيقات ويب متخصص في تطوير الحلول التقنية للكنائس والخدمات
-                المسيحية.
-              </p>
-              <p className="mb-3">
-                للتواصل والاستفسارات:{" "}
-                <a href="mailto:info@beshoymorad.com" className="text-blue-600 hover:underline">
-                  info@beshoymorad.com
-                </a>
-              </p>
+              <p className="mb-3 text-base leading-relaxed">تطبيق متابعة الحضور والسلوك لخدمة مدارس الأحد</p>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Daily Verse Section */}
+        {/* Daily Verse Section - make more compact */}
         <Dialog>
           <DialogTrigger asChild>
             <Card
-              className={`cursor-pointer ${darkMode ? "hover:bg-gray-800 bg-gray-800" : "hover:bg-blue-50 bg-white"} transition-colors`}
+              className={`cursor-pointer ${darkMode ? "hover:bg-gray-800 bg-gray-800" : "hover:bg-green-50 bg-white"} transition-colors ${isHolyWeek() ? "bg-gray-800 border-gray-700" : ""} ${isEaster() ? "border-yellow-300" : ""}`}
             >
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className={`${darkMode ? "bg-amber-900" : "bg-amber-100"} p-3 rounded-full`}>
-                  <AlertCircle className={`h-6 w-6 md:h-8 md:w-8 ${darkMode ? "text-amber-400" : "text-amber-600"}`} />
+              <CardContent className="p-3 flex items-center gap-2">
+                <div
+                  className={`${darkMode ? "bg-amber-900" : "bg-amber-100"} p-2 rounded-full ${isHolyWeek() ? "bg-gray-700" : ""} ${isEaster() ? "bg-yellow-100" : ""}`}
+                >
+                  <AlertCircle
+                    className={`h-5 w-5 ${darkMode ? "text-amber-400" : "text-amber-600"} ${isHolyWeek() ? "text-gray-400" : ""} ${isEaster() ? "text-yellow-600" : ""}`}
+                  />
                 </div>
                 <div className="flex-1">
                   <h3
-                    className={`text-lg font-bold ${darkMode ? "text-amber-400" : "text-amber-800"}`}
+                    className={`text-base font-bold ${darkMode ? "text-amber-400" : "text-amber-800"} ${isHolyWeek() ? "text-gray-300" : ""} ${isEaster() ? "text-yellow-700" : ""}`}
                     style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
                   >
                     رسالة من ربنا ليــــــــك ..؟
                   </h3>
-                  <p className={darkMode ? "text-gray-400" : "text-gray-600"}>آية اليوم للتأمل والتشجيع</p>
+                  <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs`}>
+                    شوف ربنا بيقولك اي واسمع كلامـــــه ..!
+                  </p>
                 </div>
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className={`max-w-3xl ${darkMode ? "bg-gray-800 text-white" : "bg-white"}`}>
+          <DialogContent
+            className={`max-w-3xl ${darkMode ? "bg-gray-800 text-white" : "bg-white"} ${isHolyWeek() ? "bg-gray-900 text-gray-300 border-gray-700" : ""} ${isEaster() ? "border-yellow-300" : ""}`}
+          >
             <DialogHeader>
               <DialogTitle
-                className={`text-2xl font-bold text-center mb-4 ${darkMode ? "text-white" : ""}`}
+                className={`text-2xl font-bold text-center mb-4 ${darkMode ? "text-white" : ""} ${isHolyWeek() ? "text-gray-300" : ""} ${isEaster() ? "text-yellow-700" : ""}`}
                 style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
               >
                 رسالة من ربنا ليــــــــك ..؟
               </DialogTitle>
             </DialogHeader>
-            <div className={`${darkMode ? "bg-amber-900/30" : "bg-amber-50"} p-6 rounded-lg`} dir="rtl">
+            <div
+              className={`${darkMode ? "bg-amber-900/30" : "bg-amber-50"} p-6 rounded-lg ${isHolyWeek() ? "bg-gray-800" : ""} ${isEaster() ? "bg-yellow-50" : ""}`}
+              dir="rtl"
+            >
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className={`h-5 w-5 ${darkMode ? "text-amber-400" : "text-amber-600"}`} />
-                <p className={`font-bold ${darkMode ? "text-amber-400" : "text-amber-800"}`}>
+                <Calendar
+                  className={`h-5 w-5 ${darkMode ? "text-amber-400" : "text-amber-600"} ${isHolyWeek() ? "text-gray-400" : ""} ${isEaster() ? "text-yellow-600" : ""}`}
+                />
+                <p
+                  className={`font-bold ${darkMode ? "text-amber-400" : "text-amber-800"} ${isHolyWeek() ? "text-gray-300" : ""} ${isEaster() ? "text-yellow-700" : ""}`}
+                >
                   {currentVerse.date} - {currentVerse.day}
                 </p>
               </div>
-              <p className="verse-text mb-2">{`"${currentVerse.verse}"`}</p>
-              <p className="verse-reference mb-4">📖 {currentVerse.reference}</p>
-              <p className="verse-explanation">{currentVerse.explanation}</p>
+              <p
+                className={`text-xl font-bold mb-2 ${darkMode ? "text-amber-300" : "text-amber-900"} ${isHolyWeek() ? "text-gray-200" : ""} ${isEaster() ? "text-yellow-800" : ""}`}
+              >
+                {`"${currentVerse.verse}"`}
+              </p>
+              <p
+                className={`text-sm mb-4 ${darkMode ? "text-amber-400" : "text-amber-700"} ${isHolyWeek() ? "text-gray-400" : ""} ${isEaster() ? "text-yellow-600" : ""}`}
+              >
+                📖 {currentVerse.reference}
+              </p>
+              <p className={darkMode ? "text-gray-300" : "text-gray-700"}>🕊️ {currentVerse.explanation}</p>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Synaxarium Section - make more compact */}
+        <SynaxariumCard
+          darkMode={darkMode}
+          isHolyWeek={isHolyWeek()}
+          isEaster={isEaster()}
+          onClick={() => setShowSynaxarium(true)}
+        />
       </div>
 
-      {/* Saints Section */}
-      <div className="mb-6 relative z-10">
-        <Card className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white"}`}>
-          <CardHeader className="bg-gradient-to-r from-blue-900 to-blue-800 py-3">
+      {/* Statistics Section */}
+      {showStats && students.length > 0 && (
+        <Card
+          className={`mb-4 ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white"} relative z-10 ${
+            isHolyWeek() ? "bg-gray-800 border-gray-700" : ""
+          } ${isEaster() ? "border-yellow-300" : ""}`}
+        >
+          <CardHeader
+            className={`${
+              isHolyWeek()
+                ? "bg-gray-700"
+                : isEaster()
+                  ? "bg-gradient-to-r from-yellow-100 to-yellow-50"
+                  : darkMode
+                    ? "bg-gradient-to-r from-green-900 to-green-800"
+                    : "bg-gradient-to-r from-green-50 to-green-100"
+            } py-2 px-4`}
+          >
             <CardTitle
-              className="text-center text-lg md:text-xl font-bold text-white"
+              className={`text-center text-lg md:text-xl font-bold ${
+                isHolyWeek()
+                  ? "text-gray-300"
+                  : isEaster()
+                    ? "text-yellow-800"
+                    : darkMode
+                      ? "text-white"
+                      : "text-green-800"
+              }`}
               style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
             >
-              ذكرى القديسين اليومية
+              إحصائيات الطلاب
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
-            <div className="saint-card">
-              <div className="saint-header">
-                {currentSaint.date} - {currentSaint.title}
-              </div>
-              <div className="saint-content">
-                <h3 className="saint-name">{currentSaint.name}</h3>
-                <p className="saint-description">{currentSaint.description}</p>
-              </div>
+          <CardContent className="p-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {(() => {
+                const stats = calculateStats()
+                if (!stats) return null
+
+                return (
+                  <>
+                    <div
+                      className={`p-3 rounded-lg ${
+                        isHolyWeek()
+                          ? "bg-gray-700"
+                          : isEaster()
+                            ? "bg-yellow-50"
+                            : darkMode
+                              ? "bg-gray-700"
+                              : "bg-green-50"
+                      }`}
+                    >
+                      <h3 className="text-sm font-bold mb-1 text-center">إجمالي الطلاب</h3>
+                      <p
+                        className={`text-xl font-bold text-center ${
+                          isHolyWeek()
+                            ? "text-gray-300"
+                            : isEaster()
+                              ? "text-yellow-600"
+                              : darkMode
+                                ? "text-green-400"
+                                : "text-green-600"
+                        }`}
+                      >
+                        {stats.totalStudents}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`p-3 rounded-lg ${
+                        isHolyWeek()
+                          ? "bg-gray-700"
+                          : isEaster()
+                            ? "bg-yellow-50"
+                            : darkMode
+                              ? "bg-gray-700"
+                              : "bg-green-50"
+                      }`}
+                    >
+                      <h3 className="text-sm font-bold mb-1 text-center">متوسط الحضور</h3>
+                      <p
+                        className={`text-xl font-bold text-center ${
+                          isHolyWeek()
+                            ? "text-gray-300"
+                            : isEaster()
+                              ? "text-yellow-600"
+                              : darkMode
+                                ? "text-green-400"
+                                : "text-green-600"
+                        }`}
+                      >
+                        {stats.averageAttendance}%
+                      </p>
+                    </div>
+
+                    <div
+                      className={`p-3 rounded-lg ${
+                        isHolyWeek()
+                          ? "bg-gray-700"
+                          : isEaster()
+                            ? "bg-yellow-50"
+                            : darkMode
+                              ? "bg-gray-700"
+                              : "bg-green-50"
+                      }`}
+                    >
+                      <h3 className="text-sm font-bold mb-1 text-center">متوسط السلوك</h3>
+                      <p
+                        className={`text-xl font-bold text-center ${
+                          isHolyWeek()
+                            ? "text-gray-300"
+                            : isEaster()
+                              ? "text-yellow-600"
+                              : darkMode
+                                ? "text-green-400"
+                                : "text-green-600"
+                        }`}
+                      >
+                        {stats.averageBehavior}/5
+                      </p>
+                    </div>
+
+                    <div
+                      className={`p-3 rounded-lg ${
+                        isHolyWeek()
+                          ? "bg-gray-700"
+                          : isEaster()
+                            ? "bg-yellow-50"
+                            : darkMode
+                              ? "bg-gray-700"
+                              : "bg-green-50"
+                      }`}
+                    >
+                      <h3 className="text-sm font-bold mb-1 text-center">متوسط الالتزام</h3>
+                      <p
+                        className={`text-xl font-bold text-center ${
+                          isHolyWeek()
+                            ? "text-gray-300"
+                            : isEaster()
+                              ? "text-yellow-600"
+                              : darkMode
+                                ? "text-green-400"
+                                : "text-green-600"
+                        }`}
+                      >
+                        {stats.averageCommitment}/5
+                      </p>
+                    </div>
+                  </>
+                )
+              })()}
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Search and Filter Section */}
+      <div className="flex flex-col md:flex-row gap-3 mb-4 relative z-10">
+        <div className="relative flex-1">
+          <Search
+            className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+              darkMode ? "text-gray-400" : "text-gray-500"
+            }`}
+          />
+          <Input
+            placeholder="بحث بالاسم أو الرقم..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`pl-10 ${
+              isHolyWeek()
+                ? "bg-gray-800 border-gray-700 text-gray-300"
+                : isEaster()
+                  ? "border-yellow-300"
+                  : darkMode
+                    ? "bg-gray-800 border-gray-700 text-white"
+                    : "bg-white"
+            }`}
+          />
+        </div>
+
+        <div className="w-full md:w-64">
+          <Select value={filterMonth} onValueChange={setFilterMonth}>
+            <SelectTrigger
+              className={`${
+                isHolyWeek()
+                  ? "bg-gray-800 border-gray-700 text-gray-300"
+                  : isEaster()
+                    ? "border-yellow-300"
+                    : darkMode
+                      ? "bg-gray-800 border-gray-700 text-white"
+                      : "bg-white border-green-200"
+              }`}
+            >
+              <SelectValue placeholder="تصفية حسب الشهر" />
+            </SelectTrigger>
+            <SelectContent
+              className={
+                isHolyWeek()
+                  ? "bg-gray-800 border-gray-700 text-gray-300"
+                  : isEaster()
+                    ? "border-yellow-300"
+                    : darkMode
+                      ? "bg-gray-800 border-gray-700 text-white"
+                      : ""
+              }
+            >
+              <SelectItem value="all">كل الشهور</SelectItem>
+              {months.map((m) => (
+                <SelectItem key={m} value={m}>
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="entry" className="w-full relative z-10">
-        <TabsList className={`grid grid-cols-2 mb-4 ${darkMode ? "bg-gray-800" : ""}`}>
+        <TabsList
+          className={`grid grid-cols-2 mb-4 ${
+            isHolyWeek() ? "bg-gray-800" : isEaster() ? "bg-yellow-100" : darkMode ? "bg-gray-800" : ""
+          }`}
+        >
           <TabsTrigger
             value="entry"
-            className={`text-lg font-bold ${darkMode ? "data-[state=active]:bg-blue-800 data-[state=active]:text-white" : ""}`}
+            className={`text-lg font-bold ${
+              isHolyWeek()
+                ? "data-[state=active]:bg-gray-700 data-[state=active]:text-gray-300"
+                : isEaster()
+                  ? "data-[state=active]:bg-yellow-500 data-[state=active]:text-white"
+                  : darkMode
+                    ? "data-[state=active]:bg-green-800 data-[state=active]:text-white"
+                    : ""
+            }`}
             style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
           >
             انتظار التسجيل
           </TabsTrigger>
           <TabsTrigger
             value="list"
-            className={`text-lg font-bold ${darkMode ? "data-[state=active]:bg-blue-800 data-[state=active]:text-white" : ""}`}
+            className={`text-lg font-bold ${
+              isHolyWeek()
+                ? "data-[state=active]:bg-gray-700 data-[state=active]:text-gray-300"
+                : isEaster()
+                  ? "data-[state=active]:bg-yellow-500 data-[state=active]:text-white"
+                  : darkMode
+                    ? "data-[state=active]:bg-green-800 data-[state=active]:text-white"
+                    : ""
+            }`}
             style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
           >
             قبول الآنتظار
@@ -1280,48 +1785,524 @@ export default function AttendanceTracker() {
         {/* Data Entry Tab */}
         <TabsContent value="entry">
           <Card
-            className={`border-t-4 border-blue-600 shadow-lg ${darkMode ? "bg-gray-800 text-white" : ""} border-8 border-black`}
+            className={`border-t-4 ${
+              isHolyWeek() ? "border-gray-700" : isEaster() ? "border-yellow-500" : "border-green-600"
+            } shadow-lg ${
+              isHolyWeek()
+                ? "bg-gray-800 text-gray-300"
+                : isEaster()
+                  ? "bg-white border-yellow-300"
+                  : darkMode
+                    ? "bg-gray-800 text-white"
+                    : ""
+            } border-8 border-black`}
           >
             <CardHeader
-              className={`${darkMode ? "bg-gradient-to-r from-blue-900 to-blue-800" : "bg-gradient-to-r from-blue-50 to-blue-100"} py-3`}
+              className={`${
+                isHolyWeek()
+                  ? "bg-gray-700"
+                  : isEaster()
+                    ? "bg-gradient-to-r from-yellow-100 to-yellow-50"
+                    : darkMode
+                      ? "bg-gradient-to-r from-green-900 to-green-800"
+                      : "bg-gradient-to-r from-green-50 to-green-100"
+              } py-3`}
             >
               <CardTitle
-                className={`text-center text-lg md:text-xl font-bold ${darkMode ? "text-white" : "text-blue-800"}`}
+                className={`text-center text-lg md:text-xl font-bold ${
+                  isHolyWeek()
+                    ? "text-gray-300"
+                    : isEaster()
+                      ? "text-yellow-800"
+                      : darkMode
+                        ? "text-white"
+                        : "text-green-800"
+                }`}
                 style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
               >
                 نظام متابعة الحضور والسلوك
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3">
-              {/* Form content would go here */}
-              <Button
-                onClick={handleAddStudent}
-                disabled={students.length >= 200}
-                className={`${darkMode ? "bg-blue-700 hover:bg-blue-600" : "bg-blue-600 hover:bg-blue-700"} mt-3 w-full`}
-              >
-                <PlusCircle className="h-4 w-4 mr-1" />
-                إضافة طالب جديد ({students.length}/200)
-              </Button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <Label htmlFor="name" className="block mb-1 font-bold">
+                        الاسم
+                      </Label>
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="أدخل الاسم"
+                        className={`${
+                          isHolyWeek()
+                            ? "bg-gray-700 border-gray-600"
+                            : isEaster()
+                              ? "border-yellow-300"
+                              : darkMode
+                                ? "bg-gray-700 border-gray-600"
+                                : "border-green-200 focus:border-green-500"
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="number" className="block mb-1 font-bold">
+                        الرقم
+                      </Label>
+                      <Input
+                        id="number"
+                        value={number}
+                        onChange={(e) => setNumber(e.target.value)}
+                        placeholder="أدخل الرقم (سيبدأ بـ 666)"
+                        className={`${
+                          isHolyWeek()
+                            ? "bg-gray-700 border-gray-600"
+                            : isEaster()
+                              ? "border-yellow-300"
+                              : darkMode
+                                ? "bg-gray-700 border-gray-600"
+                                : "border-green-200 focus:border-green-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <Label htmlFor="birthDate" className="block mb-1 font-bold">
+                        تاريخ الميلاد
+                      </Label>
+                      <Input
+                        id="birthDate"
+                        placeholder="أدخل تاريخ الميلاد"
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        className={`${
+                          isHolyWeek()
+                            ? "bg-gray-700 border-gray-600"
+                            : isEaster()
+                              ? "border-yellow-300"
+                              : darkMode
+                                ? "bg-gray-700 border-gray-600"
+                                : "border-green-200 focus:border-green-500"
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="month" className="block mb-1 font-bold">
+                        الشهر
+                      </Label>
+                      <Select value={month} onValueChange={setMonth}>
+                        <SelectTrigger
+                          className={`${
+                            isHolyWeek()
+                              ? "bg-gray-700 border-gray-600"
+                              : isEaster()
+                                ? "border-yellow-300"
+                                : darkMode
+                                  ? "bg-gray-700 border-gray-600"
+                                  : "border-green-200 focus:border-green-500"
+                          }`}
+                        >
+                          <SelectValue placeholder="اختر الشهر" />
+                        </SelectTrigger>
+                        <SelectContent
+                          className={
+                            isHolyWeek()
+                              ? "bg-gray-800 border-gray-700 text-gray-300"
+                              : isEaster()
+                                ? "border-yellow-300"
+                                : darkMode
+                                  ? "bg-gray-800 border-gray-700 text-white"
+                                  : ""
+                          }
+                        >
+                          {months.map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <Label className="block mb-1 font-bold">الجمعات</Label>
+                      <div
+                        className={`${
+                          isHolyWeek()
+                            ? "bg-gray-700 border-gray-600"
+                            : isEaster()
+                              ? "bg-white border-yellow-300"
+                              : darkMode
+                                ? "bg-gray-700 border-gray-600"
+                                : "bg-white border-green-200"
+                        } p-2 rounded-lg border`}
+                      >
+                        <RadioGroup
+                          className="flex justify-between"
+                          value={fridays.filter((f) => f).length.toString()}
+                          onValueChange={(value) => {
+                            const count = Number.parseInt(value)
+                            const newFridays = [false, false, false, false]
+                            for (let i = 0; i < count; i++) {
+                              newFridays[i] = true
+                            }
+                            setFridays(newFridays)
+                          }}
+                        >
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <RadioGroupItem value="0" id="friday-0" />
+                            <Label htmlFor="friday-0">0 جمعة</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <RadioGroupItem value="1" id="friday-1" />
+                            <Label htmlFor="friday-1">1 جمعة</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <RadioGroupItem value="2" id="friday-2" />
+                            <Label htmlFor="friday-2">2 جمعة</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <RadioGroupItem value="3" id="friday-3" />
+                            <Label htmlFor="friday-3">3 جمعة</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <RadioGroupItem value="4" id="friday-4" />
+                            <Label htmlFor="friday-4">4 جمعة</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="behavior" className="block mb-1 font-bold">
+                          السلوك (5%)
+                        </Label>
+                        <div
+                          className={`${
+                            isHolyWeek()
+                              ? "bg-gray-700 border-gray-600"
+                              : isEaster()
+                                ? "bg-white border-yellow-300"
+                                : darkMode
+                                  ? "bg-gray-700 border-gray-600"
+                                  : "bg-white border-green-200"
+                          } p-2 rounded-lg border`}
+                        >
+                          <Slider
+                            id="behavior"
+                            min={0}
+                            max={5}
+                            step={1}
+                            value={[behavior]}
+                            onValueChange={(value) => setBehavior(value[0])}
+                          />
+                          <div className="text-center mt-1 font-bold">{behavior}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="commitment" className="block mb-1 font-bold">
+                          الالتزام (5%)
+                        </Label>
+                        <div
+                          className={`${
+                            isHolyWeek()
+                              ? "bg-gray-700 border-gray-600"
+                              : isEaster()
+                                ? "bg-white border-yellow-300"
+                                : darkMode
+                                  ? "bg-gray-700 border-gray-600"
+                                  : "bg-white border-green-200"
+                          } p-2 rounded-lg border`}
+                        >
+                          <Slider
+                            id="commitment"
+                            min={0}
+                            max={5}
+                            step={1}
+                            value={[commitment]}
+                            onValueChange={(value) => setCommitment(value[0])}
+                          />
+                          <div className="text-center mt-1 font-bold">{commitment}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes" className="block mb-1 font-bold">
+                      ملاحظات
+                    </Label>
+                    <textarea
+                      id="notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="أدخل أي ملاحظات إضافية عن الطالب..."
+                      className={`w-full p-2 rounded-md ${isHolyWeek() ? "bg-gray-700 border-gray-600 text-gray-300" : isEaster() ? "border-yellow-300" : darkMode ? "bg-gray-700 border-gray-600 text-white" : "border-green-200 focus:border-green-500"} h-20`}
+                    />
+                  </div>
+                </div>
+
+                {/* Photo Upload Section */}
+                <div className="flex flex-col items-center justify-center">
+                  <Label className="block mb-1 font-bold">صورة الطالب</Label>
+                  <div
+                    className={`w-full h-32 border-2 border-dashed ${isHolyWeek() ? "border-gray-600 bg-gray-700" : isEaster() ? "border-yellow-300 bg-yellow-50" : darkMode ? "border-gray-600 bg-gray-700" : "border-green-300 bg-green-50"} rounded-lg flex flex-col items-center justify-center relative`}
+                  >
+                    {photoUrl ? (
+                      <div className="relative w-full h-full">
+                        <img
+                          src={photoUrl || "/placeholder.svg"}
+                          alt="صورة الطالب"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <button
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                          onClick={() => setPhotoUrl(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload
+                          className={`h-8 w-8 ${isHolyWeek() ? "text-gray-400" : isEaster() ? "text-yellow-400" : darkMode ? "text-green-400" : "text-green-400"} mb-1`}
+                        />
+                        <p
+                          className={`text-xs ${isHolyWeek() ? "text-gray-400" : isEaster() ? "text-yellow-500" : darkMode ? "text-green-400" : "text-green-500"} mb-1`}
+                        >
+                          اضغط لإضافة صورة
+                        </p>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={`${isHolyWeek() ? "text-gray-400 border-gray-600" : isEaster() ? "text-yellow-600 border-yellow-300" : darkMode ? "text-green-400 border-green-700" : "text-green-600 border-green-300"} text-xs`}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          إضافة صورة
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={handleAddStudent}
+                    disabled={students.length >= 200}
+                    className={`${isHolyWeek() ? "bg-gray-700 hover:bg-gray-600" : isEaster() ? "bg-yellow-600 hover:bg-yellow-500" : darkMode ? "bg-green-700 hover:bg-green-600" : "bg-green-600 hover:bg-green-700"} mt-3 w-full`}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-1" />
+                    إضافة طالب جديد ({students.length}/200)
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Students List Tab */}
+        {/* Students List Tab - Optimized for Mobile */}
         <TabsContent value="list">
           <Card
-            className={`border-t-4 border-blue-600 shadow-lg mb-4 ${darkMode ? "bg-gray-800 text-white" : ""} border-8 border-black`}
+            className={`border-t-4 ${isHolyWeek() ? "border-gray-700" : isEaster() ? "border-yellow-500" : "border-green-600"} shadow-lg mb-4 ${isHolyWeek() ? "bg-gray-800 text-gray-300" : isEaster() ? "bg-white border-yellow-300" : darkMode ? "bg-gray-800 text-white" : ""} border-8 border-black`}
           >
             <CardHeader
-              className={`${darkMode ? "bg-gradient-to-r from-blue-900 to-blue-800" : "bg-gradient-to-r from-blue-50 to-blue-100"} py-3`}
+              className={`${isHolyWeek() ? "bg-gray-700" : isEaster() ? "bg-gradient-to-r from-yellow-100 to-yellow-50" : darkMode ? "bg-gradient-to-r from-green-900 to-green-800" : "bg-gradient-to-r from-green-50 to-green-100"} py-3`}
             >
               <CardTitle
-                className={`text-center text-lg md:text-xl font-bold ${darkMode ? "text-white" : "text-blue-800"}`}
+                className={`text-center text-lg md:text-xl font-bold ${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-800" : darkMode ? "text-white" : "text-green-800"}`}
                 style={{ fontFamily: "'Noto Kufi Arabic', 'Amiri', serif" }}
               >
-                قائمة الطلاب
+                قائمة الطلاب {filteredStudents.length > 0 && `(${filteredStudents.length})`}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-2">{/* Table content would go here */}</CardContent>
+            <CardContent className="p-2">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader
+                    className={
+                      isHolyWeek()
+                        ? "bg-gray-700"
+                        : isEaster()
+                          ? "bg-yellow-50"
+                          : darkMode
+                            ? "bg-gray-700"
+                            : "bg-green-50"
+                    }
+                  >
+                    <TableRow>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        الصورة
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        الاسم
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        الرقم
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        تاريخ الميلاد
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        الشهر
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        ج1
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        ج2
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        ج3
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        ج4
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        السلوك
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        الالتزام
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        النسبة
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        التقدم
+                      </TableHead>
+                      <TableHead
+                        className={`${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-700" : darkMode ? "text-green-400" : "text-green-800"} font-bold text-xs`}
+                      >
+                        التقرير
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredStudents.map((student) => (
+                      <TableRow
+                        key={student.id}
+                        className={
+                          isHolyWeek()
+                            ? "hover:bg-gray-700 border-gray-700"
+                            : isEaster()
+                              ? "hover:bg-yellow-50 border-yellow-100"
+                              : darkMode
+                                ? "hover:bg-gray-700 border-gray-700"
+                                : "hover:bg-green-50"
+                        }
+                      >
+                        <TableCell>
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={student.photoUrl || "/placeholder.svg"} alt={student.name} />
+                            <AvatarFallback
+                              className={
+                                isHolyWeek()
+                                  ? "bg-gray-700"
+                                  : isEaster()
+                                    ? "bg-yellow-100"
+                                    : darkMode
+                                      ? "bg-gray-700"
+                                      : ""
+                              }
+                            >
+                              {student.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                        </TableCell>
+                        <TableCell className="font-medium text-xs">{student.name}</TableCell>
+                        <TableCell className="text-xs">{student.number}</TableCell>
+                        <TableCell className="text-xs">{student.birthDate}</TableCell>
+                        <TableCell className="text-xs">{student.month}</TableCell>
+                        {[0, 1, 2, 3].map((index) => (
+                          <TableCell key={index}>
+                            <Checkbox
+                              checked={student.fridays[index]}
+                              onCheckedChange={(checked) => updateFriday(student.id, index, checked as boolean)}
+                              className={`${isHolyWeek() ? "text-gray-500 border-gray-600" : isEaster() ? "text-yellow-500 border-yellow-300" : darkMode ? "text-green-500 border-gray-600" : "text-green-600 border-green-300"} h-4 w-4`}
+                            />
+                          </TableCell>
+                        ))}
+                        <TableCell>
+                          <Slider
+                            min={0}
+                            max={5}
+                            step={1}
+                            value={[student.behavior]}
+                            onValueChange={(value) => updateBehavior(student.id, value[0])}
+                            className="w-16"
+                          />
+                          <div className="text-center mt-1 font-bold text-xs">{student.behavior}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Slider
+                            min={0}
+                            max={5}
+                            step={1}
+                            value={[student.commitment]}
+                            onValueChange={(value) => updateCommitment(student.id, value[0])}
+                            className="w-16"
+                          />
+                          <div className="text-center mt-1 font-bold text-xs">{student.commitment}</div>
+                        </TableCell>
+                        <TableCell
+                          className={`font-bold text-xs ${isHolyWeek() ? "text-gray-300" : isEaster() ? "text-yellow-600" : darkMode ? "text-green-400" : "text-green-700"}`}
+                        >
+                          {student.percentage}%
+                        </TableCell>
+                        <TableCell className="text-xl">{getProgressEmoji(student.percentage)}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`${isHolyWeek() ? "text-gray-400 border-gray-600" : isEaster() ? "text-yellow-600 border-yellow-300" : darkMode ? "text-green-400 border-green-700" : "text-green-600 border-green-300"} text-xs p-1 h-7`}
+                            onClick={() => generateStudentReport(student)}
+                          >
+                            <FileText className="h-3 w-3 mr-1" />
+                            تقرير
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
@@ -1353,10 +2334,27 @@ export default function AttendanceTracker() {
       {/* Hidden canvas for report generation */}
       <canvas ref={reportCanvasRef} className="hidden" />
 
+      {/* Synaxarium Dialog */}
+      <SynaxariumDialog
+        open={showSynaxarium}
+        onOpenChange={setShowSynaxarium}
+        darkMode={darkMode}
+        isHolyWeek={isHolyWeek()}
+        isEaster={isEaster()}
+      />
+
       {/* Footer */}
       <div className="text-center text-gray-500 text-xs py-3 relative z-10">
         <p>© {new Date().getFullYear()} كنيسة الشهيد العظيم مارجرجس والانبا باخوميوس - العصافرة</p>
-        <p className="mt-1">تطوير: beshoymorad</p>
+        <p className="mt-1">تطوير: بيشوي مراد</p>
+
+        {/* Special message for Holy Week */}
+        {isHolyWeek() && (
+          <p className="mt-2 text-gray-400 animate-mourning">أسبوع الآلام المقدس - وقت للصلاة والتأمل</p>
+        )}
+
+        {/* Special message for Easter */}
+        {isEaster() && <p className="mt-2 text-yellow-500 font-bold animate-celebration">المسيح قام! بالحقيقة قام!</p>}
       </div>
 
       <Toaster />
